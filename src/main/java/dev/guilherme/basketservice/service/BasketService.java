@@ -8,7 +8,6 @@ import dev.guilherme.basketservice.entity.Status;
 import dev.guilherme.basketservice.repository.BasketRepository;
 import org.springframework.stereotype.Service;
 
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,5 +43,21 @@ public class BasketService {
     public Basket getBasketById(String id) {
         return repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Basket not founded"));
+    }
+
+    public Basket updateBasket(String basketId, BasketRequest request) {
+        Basket savedBasket = getBasketById(basketId);
+
+        List<Product> products = new ArrayList<>();
+        request.products().forEach(productRequest -> {
+            PlatziProductResponse platziProductResponse = productService.getProductsById(productRequest.id());
+            products.add(new Product(platziProductResponse.id(), platziProductResponse.title(),
+                    platziProductResponse.price(), productRequest.quantity()));
+        });
+
+        savedBasket.setProducts(products);
+
+        savedBasket.calculateTotalPrice();
+        return repository.save(savedBasket);
     }
 }
