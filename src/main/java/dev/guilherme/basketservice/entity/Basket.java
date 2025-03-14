@@ -1,5 +1,6 @@
 package dev.guilherme.basketservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +15,7 @@ public class Basket {
     private BigDecimal totalPrice;
     private List<Product> products;
     private Status status;
+    private PaymentMethod paymentMethod;
 
     public void calculateTotalPrice() {
         this.totalPrice = products.stream()
@@ -27,6 +29,11 @@ public class Basket {
         this.totalPrice = totalPrice;
         this.products = products;
         this.status = status;
+    }
+
+    public Basket(String id, Long client, BigDecimal totalPrice, List<Product> products, Status status, PaymentMethod paymentMethod) {
+        this(id, client, totalPrice, products, status);
+        this.paymentMethod = paymentMethod;
     }
 
     public Basket(Long client, Status status, List<Product> products) {
@@ -76,5 +83,14 @@ public class Basket {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(PaymentMethod paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 }
